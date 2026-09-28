@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% import "partials/ui.html" as ui %}
+{% block title %}Студенты · Neuro Coin{% endblock %}
+{% block body_class %}admin-body{% endblock %}
+{% block shell_class %}admin-shell{% endblock %}
+{% block sidebar_class %}admin-sidebar{% endblock %}
+{% block content %}
+{{ ui.page_header("Студенты", "CRM-профили, баланс и статусы") }}
+
+<section class="teacher-panel">
+  <div class="admin-toolbar">
+    <div>
+      <h2>Список студентов</h2>
+      <p>Откройте профиль, чтобы изменить данные, пароль, баланс или заметки.</p>
+    </div>
+    <div class="search-box"><i data-lucide="search"></i><input class="search-input" data-participant-search placeholder="Поиск по имени, логину или группе"></div>
+  </div>
+  {% if students %}
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Студент</th><th>Логин</th><th>Группа</th><th>Баланс</th><th>Статус</th><th></th></tr></thead>
+        <tbody>
+          {% for membership in students %}
+            <tr data-participant-row>
+              <td>
+                <span class="member-cell">
+                  {{ membership.user.display_name }}
+                </span>
+              </td>
+              <td class="muted">@{{ membership.user.username }}</td>
+              <td>{{ membership.group.name }}</td>
+              <td><span class="balance-chip">{{ (membership.account.balance_cached if membership.account else 0)|neuro }} Neuro</span></td>
+              <td><span class="badge {{ 'success' if membership.status == 'active' and membership.user.is_active else 'warning' }}">{{ "Активен" if membership.status == "active" and membership.user.is_active else "Ограничен" }}</span></td>
+              <td><a class="btn btn-secondary small" href="/admin/students/{{ membership.id }}"><i data-lucide="arrow-up-right"></i><span>Профиль</span></a></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    {{ ui.empty("Студентов пока нет", "Они появятся после регистрации в группе.", "user-round") }}
+  {% endif %}
+</section>
+{% endblock %}

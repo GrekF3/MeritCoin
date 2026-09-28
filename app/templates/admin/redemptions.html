@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% import "partials/ui.html" as ui %}
+{% block title %}Зачёты · Neuro Coins{% endblock %}
+{% block body_class %}admin-body{% endblock %}
+{% block shell_class %}admin-shell{% endblock %}
+{% block sidebar_class %}admin-sidebar{% endblock %}
+{% block content %}
+{{ ui.page_header("Заявки на зачёт", "Покупки награды и выполнение заявок") }}
+<section class="teacher-panel">
+  {% if redemptions %}
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Участник</th><th>Группа</th><th>Награда</th><th>Цена</th><th>Статус</th><th>Дата</th><th></th></tr></thead>
+        <tbody>
+          {% for item in redemptions %}
+            <tr>
+              <td>{{ item.membership.user.display_name }}</td>
+              <td>{{ item.membership.group.name }}</td>
+              <td>{{ item.reward.title }}</td>
+              <td>{{ item.reward.price|neuro }}</td>
+              <td><span class="badge {{ 'success' if item.status == 'fulfilled' else 'warning' }}">{{ item.status }}</span></td>
+              <td>{{ item.created_at.strftime("%d.%m.%Y %H:%M") }}</td>
+              <td>
+                {% if item.status == "pending" %}
+                  <form method="post" action="/admin/redemptions/{{ item.id }}/fulfill" data-confirm="Отметить зачёт выполненным?">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <button class="btn btn-primary small" type="submit"><i data-lucide="check"></i><span>Выполнить</span></button>
+                  </form>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    {{ ui.empty("Заявок пока нет", "Когда участник купит зачёт за 100 коинов, заявка появится здесь.", "badge-check") }}
+  {% endif %}
+</section>
+{% endblock %}

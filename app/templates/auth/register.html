@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Регистрация · NEURO COIN</title>
+  <link rel="stylesheet" href="/static/css/auth.css">
+</head>
+<body>
+  <canvas id="auth-neural-canvas" class="auth-neural-canvas" aria-hidden="true"></canvas>
+  <div class="auth-cursor" aria-hidden="true"></div>
+
+  <nav class="auth-nav">
+    <a class="auth-logo" href="/">NEURO COIN</a>
+    <a class="auth-link" href="/login">Вход</a>
+  </nav>
+
+  <main class="auth-page">
+    <section class="auth-form-wrap" aria-label="Регистрация">
+      <p class="auth-kicker">Join the system</p>
+      <p class="auth-caption">Создайте аккаунт и подключитесь к экономике группы.</p>
+
+      {% if error %}<div class="alert">{{ error }}</div>{% endif %}
+
+      <form method="post" action="/register" class="auth-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label>
+          <span>Имя участника</span>
+          <input name="display_name" autocomplete="name" placeholder="Алексей" required>
+        </label>
+        <label>
+          <span>Логин</span>
+          <input name="username" autocomplete="username" placeholder="student01" required>
+        </label>
+        <label>
+          <span>Пароль</span>
+          <input name="password" type="password" autocomplete="new-password" minlength="8" placeholder="Минимум 8 символов" required>
+        </label>
+        <label class="group-combobox">
+          <span>Группа</span>
+          <input type="hidden" name="group_id" required>
+          <input class="group-search" name="group_search" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="group-options" placeholder="Найти группу" required>
+          <div class="group-options" id="group-options" role="listbox">
+            {% for group in groups %}
+              <button type="button" class="group-option" role="option" data-value="{{ group.id }}">{{ group.name }}</button>
+            {% endfor %}
+          </div>
+        </label>
+        <button class="auth-submit" type="submit"><span class="auth-submit-text">Зарегистрироваться</span></button>
+      </form>
+
+      <p class="auth-switch">Уже есть аккаунт? <a href="/login">Войти</a></p>
+    </section>
+  </main>
+
+  <script src="/static/js/auth.js"></script>
+  <script src="/static/js/credits.js"></script>
+</body>
+</html>

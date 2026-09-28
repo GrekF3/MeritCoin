@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% import "partials/ui.html" as ui %}
+{% block title %}Зачеты · Neuro Coin{% endblock %}
+{% block body_class %}admin-body{% endblock %}
+{% block shell_class %}admin-shell{% endblock %}
+{% block sidebar_class %}admin-sidebar{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="page-title-stack">
+    <h1>Зачеты</h1>
+    <p>Назначение группе или одному студенту</p>
+  </div>
+  <button class="btn btn-primary" type="button" data-admin-modal-open="create-assessment-modal"><i data-lucide="plus"></i><span>Создать зачет</span></button>
+</div>
+{% if error %}<div class="alert danger">{{ error }}</div>{% endif %}
+
+<div class="admin-modal" id="create-assessment-modal" data-admin-modal hidden>
+  <button class="admin-modal-backdrop" type="button" data-admin-modal-close aria-label="Закрыть"></button>
+  <article class="admin-modal-dialog teacher-panel">
+    <div class="section-head">
+      <h2>Создать зачет</h2>
+      <button class="icon-btn" type="button" data-admin-modal-close aria-label="Закрыть"><i data-lucide="x"></i></button>
+    </div>
+    <form class="form crm-form" method="post" action="/admin/assessments">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label>Название
+        <input name="title" placeholder="Зачет по теме" required>
+      </label>
+      <label>Тема
+        <input name="topic" placeholder="Нейронные сети" required>
+      </label>
+      <label>Стоимость
+        <input name="cost" type="number" min="0.01" step="0.01" value="100.00" required>
+      </label>
+      <label>Срок
+        <input name="due_at" type="date">
+      </label>
+      <label>Назначение
+        <select name="scope" data-assessment-scope required>
+          <option value="group">Вся группа</option>
+          <option value="student">Один студент</option>
+        </select>
+      </label>
+      <label>Группа
+        <select name="group_id" required>
+          {% for group in groups %}
+            <option value="{{ group.id }}">{{ group.name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label class="wide-field" data-assessment-student-field hidden>Студент
+        <select name="student_membership_id">
+          <option value="">Не выбран</option>
+          {% for membership in students %}
+            <option value="{{ membership.id }}">{{ membership.user.display_name }} · {{ membership.group.name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label class="wide-field">Описание
+        <textarea name="description" rows="4" placeholder="Короткое описание для студента"></textarea>
+      </label>
+      <button class="btn btn-primary" type="submit"><i data-lucide="plus"></i><span>Создать</span></button>
+    </form>
+  </article>
+</div>
+
+<section class="assessment-layout assessment-table-layout">
+  <article class="teacher-panel">
+    <div class="section-head">
+      <h2>Список зачетов</h2>
+      <div class="search-box"><i data-lucide="search"></i><input class="search-input" data-participant-search placeholder="Поиск зачета"></div>
+    </div>
+    {% if assessments %}
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Зачет</th><th>Тема</th><th>Назначение</th><th>Стоимость</th><th>Статус</th><th></th></tr>
+          </thead>
+          <tbody>
+            {% for assessment in assessments %}
+              <tr data-participant-row>
+                <td><strong>{{ assessment.title }}</strong></td>
+                <td class="muted">{{ assessment.topic }}</td>
+                <td>
+                  {% if assessment.scope == "group" %}
+                    {{ assessment.group.name }}
+                  {% else %}
+                    {{ assessment.student_membership.user.display_name }}
+                  {% endif %}
+                </td>
+                <td>{{ assessment.cost|neuro }} Neuro</td>
+                <td><span class="badge {{ 'success' if assessment.status == 'active' else '' }}">{{ "Актуальный" if assessment.status == "active" else "Прошедший" }}</span></td>
+                <td>
+                  <form method="post" action="/admin/assessments/{{ assessment.id }}/status" data-confirm-heading="Изменить статус зачета?" data-confirm="Вы уверены, что хотите изменить статус зачета «{{ assessment.title }}»?">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    {% if assessment.status == "active" %}
+                      <input type="hidden" name="status" value="past">
+                      <button class="btn btn-secondary small" type="submit"><i data-lucide="archive"></i><span>Завершить</span></button>
+                    {% else %}
+                      <input type="hidden" name="status" value="active">
+                      <button class="btn btn-secondary small" type="submit"><i data-lucide="rotate-ccw"></i><span>Вернуть</span></button>
+                    {% endif %}
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      {{ ui.empty("Зачетов пока нет", "", "badge-check") }}
+    {% endif %}
+  </article>
+</section>
+{% endblock %}

@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Вход · NEURO COIN</title>
+  <link rel="stylesheet" href="/static/css/auth.css">
+  <link rel="stylesheet" href="/static/css/easter.css">
+</head>
+<body>
+  <canvas id="auth-neural-canvas" class="auth-neural-canvas" aria-hidden="true"></canvas>
+  <div class="auth-cursor" aria-hidden="true"></div>
+
+  <nav class="auth-nav">
+    <a class="auth-logo" href="/">NEURO COIN</a>
+    <a class="auth-link" href="/register">Зарегистрироваться</a>
+  </nav>
+
+  <main class="auth-page">
+    <section class="auth-form-wrap" aria-label="Вход">
+      <p class="auth-kicker">Student economy</p>
+      <p class="auth-caption">Личный кабинет, баланс и обмен коинами.</p>
+      {% if error %}<div class="alert">{{ error }}</div>{% endif %}
+      <form method="post" action="/login" class="auth-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label>
+          <span>Логин</span>
+          <input name="username" autocomplete="username" placeholder="student01" required>
+        </label>
+        <label>
+          <span>Пароль</span>
+          <input name="password" type="password" autocomplete="current-password" placeholder="••••••••" required>
+        </label>
+        <button class="auth-submit" type="submit"><span class="auth-submit-text">Войти</span></button>
+      </form>
+      <p class="auth-switch">Нет аккаунта? <a href="/register">Зарегистрироваться</a></p>
+    </section>
+  </main>
+
+  <script src="/static/js/auth.js"></script>
+  <script src="/static/js/easter.js"></script>
+  <script src="/static/js/credits.js"></script>
+</body>
+</html>

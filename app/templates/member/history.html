@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% import "partials/ui.html" as ui %}
+{% block title %}История · Neuro Coins{% endblock %}
+{% block content %}
+{{ ui.page_header("История операций", membership.group.name ~ " · " ~ user.display_name) }}
+<section class="card">
+  {% if transactions %}
+    {% include "partials/transaction_table.html" %}
+  {% else %}
+    {{ ui.empty("Операций пока нет", "", "history") }}
+  {% endif %}
+</section>
+{% endblock %}

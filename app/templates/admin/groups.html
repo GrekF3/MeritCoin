@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% import "partials/ui.html" as ui %}
+{% block title %}Группы · Neuro Coin{% endblock %}
+{% block body_class %}admin-body{% endblock %}
+{% block shell_class %}admin-shell{% endblock %}
+{% block sidebar_class %}admin-sidebar{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="page-title-stack">
+    <h1>Группы</h1>
+    <p>Списки учебных групп без лишних форм внутри таблиц</p>
+  </div>
+  <button class="btn btn-primary" type="button" data-admin-modal-open="create-group-modal"><i data-lucide="plus"></i><span>Создать группу</span></button>
+</div>
+{% if error %}<div class="alert danger">{{ error }}</div>{% endif %}
+
+<div class="admin-modal" id="create-group-modal" data-admin-modal hidden>
+  <button class="admin-modal-backdrop" type="button" data-admin-modal-close aria-label="Закрыть"></button>
+  <article class="admin-modal-dialog teacher-panel">
+    <div class="section-head">
+      <h2>Создать группу</h2>
+      <button class="icon-btn" type="button" data-admin-modal-close aria-label="Закрыть"><i data-lucide="x"></i></button>
+    </div>
+    <form class="form crm-form" method="post" action="/admin/groups">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label>Название
+        <input name="name" placeholder="Маркетинг" required>
+      </label>
+      <button class="btn btn-primary" type="submit"><i data-lucide="plus"></i><span>Создать</span></button>
+    </form>
+  </article>
+</div>
+
+<section class="groups-layout groups-list-layout">
+  <article class="teacher-panel">
+    <div class="section-head">
+      <h2>Список групп</h2>
+      <div class="search-box"><i data-lucide="search"></i><input class="search-input" data-participant-search placeholder="Поиск группы"></div>
+    </div>
+    {% if groups %}
+      <div class="plain-list">
+        {% for row in groups %}
+          <div class="plain-row group-row" data-participant-row>
+            <a class="group-row-main" href="/admin/groups/{{ row.group.id }}">
+              <div>
+                <strong>{{ row.group.name }}</strong>
+                <span>{{ row.participants_count }} студентов</span>
+              </div>
+              <span class="balance-chip">{{ row.total_coins|neuro }} Neuro</span>
+            </a>
+            <div class="row-actions">
+              <a class="btn btn-secondary small" href="/admin/groups/{{ row.group.id }}"><i data-lucide="arrow-up-right"></i><span>Открыть</span></a>
+              <form method="post" action="/admin/groups/{{ row.group.id }}/delete" data-confirm="Удалить группу «{{ row.group.name }}» и все связанные данные: студентов группы, балансы, транзакции, зачеты и оплаты?" data-confirm-heading="Удалить группу?">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <button class="btn btn-danger small" type="submit"><i data-lucide="trash-2"></i><span>Удалить</span></button>
+              </form>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      {{ ui.empty("Групп пока нет", "", "users-round") }}
+    {% endif %}
+  </article>
+</section>
+{% endblock %}

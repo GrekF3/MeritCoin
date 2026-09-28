@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% import "partials/ui.html" as ui %}
+{% block title %}Транзакции · Neuro Coins{% endblock %}
+{% block body_class %}admin-body{% endblock %}
+{% block shell_class %}admin-shell{% endblock %}
+{% block sidebar_class %}admin-sidebar{% endblock %}
+{% block content %}
+{{ ui.page_header("Транзакции", "Журнал операций с коинами") }}
+<section class="teacher-panel">
+  {% if transactions %}
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Дата</th><th>Тип</th><th>Группа</th><th>Инициатор</th><th>Отправитель</th><th>Получатель</th><th>Сумма</th><th>Комиссия</th><th>Причина</th></tr></thead>
+        <tbody>
+          {% for tx in transactions %}
+            <tr>
+              <td>{{ tx.created_at.strftime("%d.%m.%Y %H:%M") }}</td>
+              <td><span class="badge tx-type">{{ tx.type.value }}</span></td>
+              <td>{{ tx.group.name }}</td>
+              <td>{{ tx.initiator.display_name }}</td>
+              <td>{{ tx.from_account.membership.user.display_name if tx.from_account else "—" }}</td>
+              <td>{{ tx.to_account.membership.user.display_name if tx.to_account else "—" }}</td>
+              <td>{{ tx.amount|neuro }}</td>
+              <td>{{ tx.fee|neuro }}</td>
+              <td>{{ tx.reason or "—" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    {{ ui.empty("Транзакций пока нет", "Журнал заполнится после начислений, переводов и покупок.", "scroll-text") }}
+  {% endif %}
+</section>
+{% endblock %}

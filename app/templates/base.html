@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Neuro Coins{% endblock %}</title>
+    <link rel="stylesheet" href="/static/vendor/modern-normalize/modern-normalize.min.css">
+    <link rel="stylesheet" href="/static/css/admin.css">
+  </head>
+  <body class="{% block body_class %}app-body{% endblock %}">
+    {% if user is defined and user %}
+      <div class="{% block shell_class %}app-shell{% endblock %}" data-shell x-data="{ sidebarOpen: false }">
+        <aside class="{% block sidebar_class %}sidebar{% endblock %}" data-sidebar :class="{ 'open': sidebarOpen }">
+          <div class="brand-lockup">
+            <div>
+              <a class="brand-name" href="/">NEURO COIN</a>
+              <div class="brand-sub">{{ "Преподавательская панель" if user.role.value == "admin" else "Личный кабинет" }}</div>
+            </div>
+          </div>
+          <nav class="nav">
+            {% if user.role.value == "admin" %}
+              <a href="/admin" class="{{ 'active' if request.url.path == '/admin' else '' }}"><i data-lucide="layout-dashboard"></i><span>Обзор</span></a>
+              <a href="/admin/students" class="{{ 'active' if request.url.path.startswith('/admin/students') else '' }}"><i data-lucide="user-round-cog"></i><span>Студенты</span></a>
+              <a href="/admin/assessments" class="{{ 'active' if request.url.path.startswith('/admin/assessments') else '' }}"><i data-lucide="badge-check"></i><span>Зачеты</span></a>
+              <a href="/admin/groups" class="{{ 'active' if request.url.path.startswith('/admin/groups') else '' }}"><i data-lucide="users-round"></i><span>Группы</span></a>
+              <a href="/admin/transactions" class="{{ 'active' if request.url.path == '/admin/transactions' else '' }}"><i data-lucide="arrow-right-left"></i><span>Транзакции</span></a>
+              <a href="/admin/settings" class="{{ 'active' if request.url.path == '/admin/settings' else '' }}"><i data-lucide="settings"></i><span>Настройки</span></a>
+            {% else %}
+              <a href="/me" class="{{ 'active' if request.url.path == '/me' else '' }}"><i data-lucide="wallet-cards"></i><span>Мой баланс</span></a>
+              <a href="/me/history" class="{{ 'active' if request.url.path == '/me/history' else '' }}"><i data-lucide="history"></i><span>История операций</span></a>
+              <a href="/me#transfer" class=""><i data-lucide="arrow-right-left"></i><span>Перевести коины</span></a>
+              <a href="/me#redeem" class=""><i data-lucide="graduation-cap"></i><span>Потратить на зачёт</span></a>
+              <a href="/me" class=""><i data-lucide="settings"></i><span>Настройки</span></a>
+            {% endif %}
+          </nav>
+          <form class="sidebar-logout" method="post" action="/logout">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button class="nav-logout" type="submit"><i data-lucide="log-out"></i><span>Выход</span></button>
+          </form>
+        </aside>
+        <button class="scrim" type="button" x-cloak x-show="sidebarOpen" x-transition.opacity @click="sidebarOpen = false" aria-label="Закрыть меню"></button>
+        <div class="content-wrap">
+          <header class="mobile-topbar">
+            <button class="icon-btn" type="button" data-sidebar-toggle @click="sidebarOpen = true" aria-label="Открыть меню"><i data-lucide="menu"></i></button>
+            <span>NEURO COIN</span>
+          </header>
+          <main class="main">
+            {% if user.role.value != "admin" %}
+              <div class="profile-pill">
+                <span class="profile-avatar"><i data-lucide="user-round"></i></span>
+                <span>{{ user.display_name }}</span>
+              </div>
+            {% endif %}
+            {% block content %}{% endblock %}
+          </main>
+        </div>
+      </div>
+    {% else %}
+      {% block auth_content %}{% endblock %}
+    {% endif %}
+    <div class="confirm-modal" data-confirm-modal hidden>
+      <div class="confirm-backdrop" data-confirm-cancel></div>
+      <div class="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+        <h2 id="confirm-title" data-confirm-title>Подтвердить действие?</h2>
+        <p data-confirm-message>Вы уверены?</p>
+        <div class="confirm-actions">
+          <button class="btn btn-secondary small" type="button" data-confirm-cancel>Отмена</button>
+          <button class="btn btn-primary small" type="button" data-confirm-accept>Подтвердить</button>
+        </div>
+      </div>
+    </div>
+    <script defer src="/static/vendor/alpine/alpine.min.js"></script>
+    <script src="/static/vendor/lucide/lucide.min.js"></script>
+    <script src="/static/js/app.js"></script>
+    <script src="/static/js/credits.js"></script>
+  </body>
+</html>

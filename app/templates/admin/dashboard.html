@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% import "partials/ui.html" as ui %}
+{% block title %}Обзор · Neuro Coin{% endblock %}
+{% block body_class %}admin-body{% endblock %}
+{% block shell_class %}admin-shell{% endblock %}
+{% block sidebar_class %}admin-sidebar{% endblock %}
+{% block content %}
+{{ ui.page_header("Обзор", "Короткая сводка CRM преподавателя") }}
+
+<section class="metric-grid" aria-label="Сводка">
+  {{ ui.stat_card("Группы", stats.groups, "layers", "cyan") }}
+  {{ ui.stat_card("Студенты", stats.members, "users-round", "magenta") }}
+  {{ ui.stat_card("Баланс", stats.coins|neuro, "coins", "cyan") }}
+  {{ ui.stat_card("Активные зачеты", stats.pending, "badge-check", "magenta") }}
+</section>
+
+<section class="crm-dashboard-grid">
+  <article class="teacher-panel">
+    <div class="section-head">
+      <h2>Последние оплаты</h2>
+      <a class="text-link" href="/admin/assessments">Все зачеты</a>
+    </div>
+    {% if payments %}
+      <div class="activity-list">
+        {% for payment in payments %}
+          <a class="activity-row" href="/admin/students/{{ payment.membership.id }}">
+            <div>
+              <strong>{{ payment.membership.user.display_name }}</strong>
+              <span>{{ payment.assessment.title }} · {{ payment.assessment.cost|neuro }} Neuro</span>
+            </div>
+            <time>{{ payment.created_at.strftime("%d.%m") }}</time>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      {{ ui.empty("Оплат пока нет", "", "badge-check") }}
+    {% endif %}
+  </article>
+</section>
+
+<section class="teacher-panel">
+  <div class="section-head">
+    <h2>Последние транзакции</h2>
+    <a class="text-link" href="/admin/transactions">Открыть журнал</a>
+  </div>
+  {% if transactions %}
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Дата</th><th>Тип</th><th>Группа</th><th>Инициатор</th><th>Сумма</th><th>Причина</th></tr></thead>
+        <tbody>
+          {% for tx in transactions %}
+            <tr>
+              <td>{{ tx.created_at.strftime("%d.%m %H:%M") }}</td>
+              <td><span class="badge tx-type">{{ tx.type.value }}</span></td>
+              <td>{{ tx.group.name }}</td>
+              <td>{{ tx.initiator.display_name }}</td>
+              <td>{{ tx.amount|neuro }}</td>
+              <td>{{ tx.reason or "—" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    {{ ui.empty("Транзакций пока нет", "", "scroll-text") }}
+  {% endif %}
+</section>
+{% endblock %}

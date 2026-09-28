@@ -1,0 +1,26 @@
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Дата</th>
+        <th>Тип</th>
+        <th>Сумма</th>
+        <th>Комиссия</th>
+        <th>Причина</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in transactions %}
+        {% set tx = item.tx if item.tx is defined else item %}
+        {% set delta = item.entry.delta if item.entry is defined else tx.amount %}
+        <tr>
+          <td>{{ tx.created_at.strftime("%d.%m.%Y %H:%M") }}</td>
+          <td><span class="badge tx-type">{{ tx.type.value }}</span></td>
+          <td class="{{ 'amount-plus' if delta > 0 else 'amount-minus' }}">{{ delta|signed_neuro }}</td>
+          <td>{{ tx.fee|neuro }}</td>
+          <td>{{ tx.reason or "—" }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

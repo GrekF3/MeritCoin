@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% import "partials/ui.html" as ui %}
+{% block title %}Настройки · Neuro Coin{% endblock %}
+{% block body_class %}admin-body{% endblock %}
+{% block shell_class %}admin-shell{% endblock %}
+{% block sidebar_class %}admin-sidebar{% endblock %}
+{% block content %}
+{{ ui.page_header("Настройки", "Комиссии и ограничения переводов") }}
+{% if error %}<div class="alert danger">{{ error }}</div>{% endif %}
+
+<section class="settings-layout">
+  <article class="teacher-panel">
+    <div class="section-head"><h2>Переводы студентов</h2></div>
+    <form class="form crm-form" method="post" action="/admin/settings">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label>Комиссия, %
+        <input name="transfer_fee_percent" type="number" min="0" max="100" step="0.01" value="{{ transfer_policy.fee_percent|neuro }}" required>
+      </label>
+      <label>Максимум перевода, % от баланса
+        <input name="transfer_max_percent" type="number" min="0.01" max="100" step="0.01" value="{{ transfer_policy.max_percent|neuro }}" required>
+      </label>
+      <button class="btn btn-primary" type="submit"><i data-lucide="save"></i><span>Сохранить</span></button>
+    </form>
+  </article>
+
+  <article class="teacher-panel">
+    <div class="section-head"><h2>Пароль администратора</h2></div>
+    {% if password_error %}<div class="alert danger">{{ password_error }}</div>{% endif %}
+    {% if password_success %}<div class="alert success">Пароль обновлен</div>{% endif %}
+    <form class="form crm-form" method="post" action="/admin/settings/password">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label>Текущий пароль
+        <input name="current_password" type="password" autocomplete="current-password" required>
+      </label>
+      <label>Новый пароль
+        <input name="new_password" type="password" autocomplete="new-password" required>
+      </label>
+      <label>Повторите пароль
+        <input name="confirm_password" type="password" autocomplete="new-password" required>
+      </label>
+      <button class="btn btn-primary" type="submit"><i data-lucide="key-round"></i><span>Обновить пароль</span></button>
+    </form>
+  </article>
+
+  <article class="teacher-panel">
+    <div class="section-head"><h2>Текущая политика</h2></div>
+    <div class="settings-summary">
+      <div>
+        <span>Комиссия</span>
+        <strong>{{ transfer_policy.fee_percent|neuro }}%</strong>
+      </div>
+      <div>
+        <span>Максимум от баланса</span>
+        <strong>{{ transfer_policy.max_percent|neuro }}%</strong>
+      </div>
+    </div>
+  </article>
+</section>
+{% endblock %}
