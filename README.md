@@ -1,4 +1,4 @@
-# Student Rewards Platform
+# MeritCoin
 
 A classroom rewards and assessment platform with balances, transfers, and role-based workflows.
 
